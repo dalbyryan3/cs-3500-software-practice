@@ -1,0 +1,103 @@
+<GameSettings>
+  <UniverseSize>1200</UniverseSize>
+  <MSPerFrame>20</MSPerFrame>
+  <FramesPerShot>20</FramesPerShot>
+  <RespawnRate>300</RespawnRate> 
+  
+  
+  <!-- left border -->
+  <Wall>
+    <p1><x>-575</x><y>425</y></p1>
+	<p2><x>-575</x><y>575</y></p2>
+  </Wall>
+
+  <!-- left border -->
+  <Wall>
+    <p1><x>-575</x><y>-575</y></p1>
+	<p2><x>-575</x><y>175</y></p2>
+  </Wall>
+  
+  <!-- right border -->
+  <Wall>
+    <p1><x>575</x><y>425</y></p1>
+	<p2><x>575</x><y>575</y></p2>
+  </Wall>
+
+  <!-- right border -->
+  <Wall>
+    <p1><x>575</x><y>-575</y></p1>
+	<p2><x>575</x><y>175</y></p2>
+  </Wall>
+   
+  <!-- upper left 'L' piece -->
+  <Wall>
+    <p1><x>-325</x><y>-325</y></p1>
+	<p2><x>-175</x><y>-325</y></p2>
+  </Wall>  
+  
+  <Wall>
+    <p1><x>-325</x><y>-325</y></p1>
+	<p2><x>-325</x><y>-175</y></p2>
+  </Wall>
+  
+  
+  <!-- upper right 'L' piece -->
+  <Wall>
+    <p1><x>325</x><y>-325</y></p1>
+	<p2><x>175</x><y>-325</y></p2>
+  </Wall>  
+  
+  <Wall>
+    <p1><x>325</x><y>-325</y></p1>
+	<p2><x>325</x><y>-175</y></p2>
+  </Wall>
+  
+  
+  <!-- lower right 'L' piece -->
+  <Wall>
+    <p1><x>325</x><y>325</y></p1>
+	<p2><x>175</x><y>325</y></p2>
+  </Wall>  
+  
+  <Wall>
+    <p1><x>325</x><y>325</y></p1>
+	<p2><x>325</x><y>175</y></p2>
+  </Wall>
+  
+  
+  <!-- lower left 'L' piece -->
+  <Wall>
+    <p1><x>-325</x><y>325</y></p1>
+	<p2><x>-175</x><y>325</y></p2>
+  </Wall>  
+  
+  <Wall>
+    <p1><x>-325</x><y>325</y></p1>
+	<p2><x>-325</x><y>175</y></p2>
+  </Wall>
+  
+  
+  <!-- bottom innermost wall -->
+  <Wall>
+    <p1><x>-50</x><y>-175</y></p1>
+	<p2><x>50</x><y>-175</y></p2>
+  </Wall> 
+
+  <!-- top innermost wall -->
+  <Wall>
+    <p1><x>-50</x><y>175</y></p1>
+	<p2><x>50</x><y>175</y></p2>
+  </Wall> 
+
+  <!-- left innermost wall -->
+  <Wall>
+    <p1><x>-175</x><y>-50</y></p1>
+	<p2><x>-175</x><y>50</y></p2>
+  </Wall>   
+  <!-- right innermost wall -->
+  <Wall>
+    <p1><x>175</x><y>-50</y></p1>
+	<p2><x>175</x><y>50</y></p2>
+  </Wall>  
+
+</GameSettings>
