@@ -1,0 +1,332 @@
+CS 3500 Notes 2:
+
+Networking 
+	Address: URL or IP address
+		IP address (IPv4) is a 32 bit value 
+		URL	
+			DNS(Domain Name System) is a server that is used to translate a URL to an IP address
+	Client/Server
+		Server- listener
+		Client- initiator 
+	IP Routing- intermediate routing between client and server
+	
+	Port
+		Think of it as a the recipient in a large household
+		Ports are assigned to individual processes
+		Some ports are "officially" reserved (Usually in the under 1000 range)
+		Some are reserved by convention
+		Typically port and IP address specified as
+			IP:port
+		
+	Protocol
+		Some types of protocols:
+		
+		TCP (Transmission Control Protocol)
+			Makes certain "guarantees"- packet delivery, ordering, integrity
+			Usually sits on top of IP (TCP/IP)
+			TCP/IP is just about getting data there in-tact, the "payload" is still just bytes
+				Must agree on what those bytes mean
+			
+		UDP (User Datagram Protocol)
+			Makes no guarantees ("Fire and forget")
+			Packets may be lost, unordered, corrupted
+			Used because can be faster than TCP/IP
+			
+		Can stack protocols:
+			EX: Web browsing typically looks like: HTTP/TCP/IP
+			
+		Game we will write will look like:
+			<Custom Protocol>/TCP/IP
+			
+	Using an address, port, and protocol we can send/receive data
+	
+	Network Analogy: (Physical world	Internet)
+		EX:
+		address: 			Address of mailbox		IP Address
+		network: 			Postal Service 			routers	
+		recipient/port: 	Recipient Name			an application  
+		protocol:			English					HTTP/TCP/IP
+	
+Socket
+	Represents a connection, it encapsulates local IP/port, remote IP/port
+	Server and client each have their own Socket object	
+Socket in C#
+	C# has a Socket API to provide methods for sending/receiving data on that connection. 
+	C# has concurrency already build into its built-in networking methods. 
+	
+Concurrency is used extensively in networking situations like games, a thread may be listening for information a other threads do things like draw or make computations.
+	Will see that using callbacks (really just passing functions that have a defined behavior to be used at some point) allows for use of asynchronous methods that can utilize concurrency
+
+TcpListener class listens for incoming connections
+	Creates a new Socket when connection arrives
+Connect to a server from client in C# once server is running a TcpListener using:
+	socket.BeginConnect(...)- starts connection processes
+	socket.EndConnect(...)- completes the connection process, does not stop connection
+		When to call EndConnect? 
+			Use BeginConnect(..., AsyncCallback OnConnect)
+				takes a delegate parameter, this OnConnect method is on its own thread, this OnConnect method is invoked by the OS, not directly in this code
+		
+	socket.BeginRecieve(..., AsyncCallback MyCallback)
+		Uses a delegate to take action once data has arrived, this MyCallback method is invoked by the OS, not directly in this code
+		Delegate can save/process data
+		
+		When to call BeginRecieve?
+			Don't ask for new data until data has been received.
+			Thus can call BeginRecieve again in MyCallback. 
+				This is not recursion, more like an EVENT "LOOP" that has an iteration of the loop triggered by receiving data (driven by events, event handler resumes loop)
+		
+	socket.EndRecieve(...)- ends pending asynchronous read
+		
+Networking software is typically asynchronous, methods return right away even if result isn't done
+Anything related to one connection is done on its own thread
+	
+Servers are typically parallel servers so there is not delay with multiple clients when waiting for data.
+
+Connecting to a Server in C#
+	 Need an IPAddress- create IPAddress object 
+	 Next need a Socket- create a Socket object 
+	 Then SocketObj.BeginConnect(..., OnConnect)
+	 In OnConnect call SocketObj.EndConnect(...) // give IAsyncResult of required OnConnect method signature
+	 Finally can begin BeginRecieve process of receive
+	
+"Nomadic" State (Just a professor made up word for a common idea)
+	State that represents a connection is "nomadic"
+	It doesn't live in one place 
+	Continuously passed around as a parameter
+	This is a common idea/way of dealing with state in the EVENT "LOOP" that is used for receiving data
+	
+There is NO CORRELATION between calls to send and receive 
+	This is primary due to the abstraction going on underneath
+	Thus have to define what the start and end of a message is since calls to receive and send are not correlated, i.e. one send does not mean one receive or vice-versa
+		Thus defining a protocol for a type of message will allow for knowing if a full message is received 
+
+
+JSON
+	JavaScript Object Notation
+	Similar to XML in many ways
+	Describes an object, no types
+	EX: {"ID":2, "loc":{"x":35,"y":-2}}
+	
+	Can automatically convert an object to JSON and vice-versa 
+	When converting from JSON to an object you specify type and if not compatible will throw exception
+	
+	Put a tag above each field (and another tag for the class to be included) to indicate it should be included for serialization when converting from an object to JSON 
+		Can add parameters to the tags to change the serialization behavior
+	
+	How to know what type a JSON represents without trying to parse a specific type?
+		Can use a JObject.Parse(jsonObj) which will give information about the jsonObj and then can use that information to determine what type is without blindly trying and catching.
+		
+		
+		
+Software Engineering
+	Abstraction is present at all levels, allows us to do useful stuff.
+	
+	Recap- engineering principles but not necessary for a correct program but create good code:
+	Data protection and encapsulation- hide details from users, not necessary for their concerns, can still use it the same
+	Modularization- clearer meaning, no copied code 
+	Self-documenting code- reduces reader's effort
+	data lifetime- globals not needed, don't make a member of a class if can be local
+	
+	"Code Smell"
+		On the surface indication of a deeper problem
+		Possible issue, may need to address
+		EX: Using a for loop when you could use a foreach loop on an iterable object
+	
+	Design Pattern
+		A solution to commonly-encountered software engineering problems
+		Not always the solution or necessary to use design patterns
+			Useful if you end up in a situation where it may help to use a design pattern
+			Remember design to solve the problem not to use design patterns, design patterns are just tools useful in some cases
+	Abstraction is the ultimate design pattern, it is the fundemental goal of software engineering
+	Abstraction enables seperation of concerns 
+	
+	Anti-Patterns
+		Far more important than design patterns, indicates you should address the problem
+		
+		Some anti-patterns:
+			Hard-coding constants
+				Will allow much easier changing in future if a variable holds the constant value
+			Copied Code
+				Will be difficult to make changes in future
+			Pre-optimizing
+				Don't optimize until necessary, straightforward implementation first, 
+				only optimize if needed, then use a profiler to find what part should be optimized
+			Circular Dependencies 
+				If two things need references to each other it likely indicates a design issue
+				Ask who "owns" the data (Where are the objects created; using "new")
+				Have another class that defines the relationship between the original two things
+			Magic Button
+				Not separating logic from the front end event happening, like a button press
+			God object
+				Too much functionality or data in one class
+			Repeating yourself
+				Writing code that contains excessive repetition when could be abstracted in a way
+			Reinventing the wheel
+				If an existing implementation exists that works for situation, use it
+			Silver Bullet
+				There is not one language that is the "best" for all situations
+				
+	Pair programming 
+		Can make better code with less bugs, driver can program while the navigator can see the bigger picture
+		
+Optimization
+	First rule- Don't 
+	Second rule- Let the compiler do it
+	Third rule- Use a profiler if still not fast enough
+	
+	Compiler optimization
+		EX: when using gcc(GNU compiler collection) can set different flags for how much to optimize at the cost of compile time
+		EX: in C# optimization is done by the runtime (JIT)
+		Micro Optimizing- assuming a gcc-like compiler:
+			using cheaper operations (like two multiplies and a divide rather than two divides)
+			code motion- moving code out of a loop that has no side effects
+			access patterns- accessing data in certain patterns (order) can be faster than others
+				caching, memory system, prefetching
+	
+	Profiling
+		Determines where the program spends time
+		The profiler stops the program once-in-a-while and examines where it is executing (Sampling)
+		Aliasing- when sampling at the exact wrong rate where nothing useful can be obtained
+			To address this and get an accurate representation of where the program spends time, profiler "jitters" sampling in a pseudo-random way
+		
+MVC- by using delegates we can have a class call a method of another class that it does not have a reference to.
+
+Handshaking- initial exchange of information between participants to set up the communication link before full communication begins
+	EX: Using our networking library we already wrote we can call one of its methods with our own callback which will "call" another one of our callbacks 
+	(by changing the callback action of our state object passed between the library and the user (changed inside of the callback which "calls" the next one)) 
+	and then we could continue that process of stringing callbacks together to form the handshake between the client and server.
+
+HTTP- HyperText Transfer Protocol
+	Text-based, almost human readable
+	Defines how messages are formatted and transmitted on the World Wide Web, 
+	and what actions Web servers and browsers should take in response to various commands.
+	
+URLs are in the form:
+	scheme://host:port/path?query
+		scheme- protocol (ftp http etc)
+		host- server name or address
+		port- which port to use (optional, default for scheme if left out)
+		path- file/directory/page to access (optional, information the webserver uses to decide what to return)
+		query- additional parameters/options (optional)
+		
+	Special characters- what if the path or query contains & (or other special characters)? (URL interpreter will think it is a seperator)
+		Replace special characters with %XX where XX is a hexadecimal representation of the ASCII character 
+	
+	
+Databases 
+	Stores- account info, inventory info, message info, photos, transaction history, and more.
+	
+	"Big Data" has different challenges
+		Vast amounts of data
+		Fast access/combination/filtering 
+		Must be available (online, securely, to simultaneous users)
+		
+	
+		What about XML? Querying for something specific can be difficult.
+		
+		Use databases to take advantage of decades of research- don't reinvent the wheel
+		
+	Two components of a Database
+		Database Management System (DBMS)
+			All the underlying machinery
+			Essentially the server
+			EX: MySQL (Open source database management system, implements SQL)
+			Goals:
+				Atomicity- operations succeed completely or not at all
+				Consistency- operations leave database in consistent state
+				Isolation- Operations don't interfere with each other
+				Durability- Results will not be lost
+		Query Language
+			Interface to the machinery
+			EX: SQL- Structured Query Language (Interface for accessing a relational database, get data, set data, change data)
+		
+		
+	Instead of using an I/O library use SQL(Query language, not language dependent) and DBMS to interface with OS and Disk 
+		
+		
+	Relational Databases- structured storage
+		Related data are stored "next to" each other
+			e.g. in a table
+			this is a relation 
+		Database comprised of one or more tables, each table is a "relation"
+			each row is a tuple- a set of data units (general term)
+			a relation can not have duplicate tuples (rows)
+			
+		DBMS builds "index" data structures around many of the columns 
+		
+		Will build tables (relations) with relations to each other by picking some unique identifier field to relate them.
+		By having separate tables (rather than just one) it helps meet the DBMS goals.
+		
+
+	SQL- Structured Query Language
+		Some basic SQL commands:
+		SELECT- inputs a relation and results in a relation
+			Using SELECT and FROM and WHERE:
+				EX: SELECT <columns> FROM <table>
+				
+				EX: SELECT <columns> FROM <table> WHERE <condition>
+					<condition> can be complex- combines with AND, OR, etc. 
+						conditions comprised of comparisons
+
+		JOIN- Creates a temporary table, operating on any two relations, is like full cross product of rows
+			EX: <table> JOIN <table>
+
+MySQL data types
+	Some MySQL data types:
+		Numeric
+			Integers
+				<tiny,small,medium,big>int, <unsigned>
+			Real numbers
+				float, double, decimal
+		Dates
+			date, datetime, timestamp, time, year 
+		Blobs- Binary Large Objects
+		Enums
+		Strings
+			char(N)- exactly N character, varchar(N)- up to N characters
+		
+		
+MySQL properties- Can indicate SQL properties(constraints) for things in SQL and it can help for optimization
+	Some MySQL Column Properties:
+		not null- specifying that a column can't be null improves query optimizations 
+		default 'hello'
+		auto_increment 
+	
+	Some MySQL Table Properties:
+		primary key (columnName)- optimizes access by creating an "index", defines meaning of data
+
+Ray Tracing
+	A ray is an origin and a direction
+		Starting point and an infinite half line
+	Determining when a ray intersects a circle yields a second order polynomial
+		Can check the discriminant of that polynomial to determine if an intersection of a ray with a circle occurs
+		
+Workload distribution when parallelizing 
+	Static workload distribution- dividing the work before hand
+	Dynamic workload distribution- each thread picks a new task periodically, tasks should be fairly small and numerous for better distribution
+	Atomic increment- Many CPUs including x86 have hardware support for "locking" during an instruction 
+	Limit the number of active threads when dynamically assigning work to a reasonable amount
+
+Parallelism 
+	Thread-level parallelism: Multiple broad tasks, at different points in program
+	Data-level parallelism: Multiple identical tasks, but with different inputs
+		SIMD- Single Input Multiple Data
+			Computer instruction set that allows for one instruction to execute in parallel on multiple data points (Must be the same instruction)
+
+
+
+
+
+Class Summary Points:
+
+Delegates and Closure
+	Treat functions as values, can be passed, stored, returned, invoked
+	Use to customize general algorithms (associate callbacks with activity) 
+	Closure- saves access to scope from which it was created
+Events- delegates define handlers
+Threads and Asynchronously- explicitly and implicitly creating threads
+Concurrency- Multiple things happening simultaneously, order of events not well defined, critical sections, race conditions
+Sockets and Event Loops
+	Sockets- represent network connections
+	Event driven loops- only proceed when something happens.
+

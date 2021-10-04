@@ -1,0 +1,701 @@
+CS 3500 Software Practice Notes:
+
+Most important principals in software engineering:
+	Abstraction
+	Separation of Concerns
+
+Abstraction:
+As a whole:
+	Programming Language 	(High Level)
+	Compiler
+	OS
+	Architecture
+	Circuits
+	Physics 	(Low Level)
+
+Just within Programming Language:
+	API- Application Programming Interface- set of functions or operations which allow you to use a library or set of code    (High Level)
+	Classes
+	Data Structures
+	Functions
+	Variables and Statements
+	Types and Operators	(Low Level)
+
+
+From Java to C# :
+	Similarities:
+		compiled to an intermediate form
+		run in a "runtime" (or JVM)
+		automatic memory management
+	Biggest Differences:
+		C# functions are first-class types (but it's not a functional language; Does not require you to use functional principles)
+		C# naturally supports events
+		Primitive types work with generics
+		
+Multi-line comments in C# can be in XML form
+
+C# Memory Model- Non-primitive types are (object) references (Just like Java) (Difference between Java and C# compared to C++ is C++ allows you control how you pass something more directly)
+Still use derefrencing dot operator to operate on object reference like Java
+
+C# has private, protected, public etc.  once again these are there to reinforce good design practices rather than being key to the functionality of the program
+
+C# uses namespaces- a scope for type names / sets apart type names (Takes the idea of namespaces from C)
+	EX: namespace Math
+	{
+	public class Vector{...}
+	}
+	namespace Collections
+	{
+	public class Vector{...}
+	}
+	
+	Can use different Vectors from different name spaces: Math.Vector() or Collections.Vector()
+	
+	Can then use keyword using: 
+	EX: using Math (at top of .cs file)- Automatically searches Math namespace for types 
+
+
+Static in C#
+	Methods: Belongs to the class as a whole, not one instance of the class
+	Members: Belongs to the class as a whole, not one instance of the class
+	Classes: Contains only static members and methods- cannot be instantiated 
+	
+	Warning: static variables are global, not just part of an instance of the object
+
+readonly field modifier - defines read-only fields: only can be assigned in construction when variable is created
+Interfaces in C#- same as Java- "contract" of the methods a type must implement
+	capital I in name will denote many of the built-in interfaces of C#
+
+Generics in C# :
+	An example in Java is using a comparator in order to compare two objects generically and pass in a functor object to essentially hold a method.
+		(In Java: Function objects- an object that defines a single method; A comparator(provides a way of comparing two things) is an example of a function object.)
+		(i.e. In Java can pass a comparator object(we create) that implements Comparator Interface to allow us to compare)
+	
+	In C# we can just pass a delegate because functions are first class citizens and can pass a function into a function
+		To use a function variable we need to know the signature of the function (need inputs, outputs)
+		Thus we use: EX:  delegate int Comparator(int i1, int i2); (Comparator is now a "type", similar to creating your own type)
+		
+Delegates in C#
+	From docs.microsoft.com:
+	A delegate is a type that represents references to methods with a particular parameter list and return type. 
+	When you instantiate a delegate, you can associate its instance with any method with a compatible signature and return type. 
+	You can invoke (or call) the method through the delegate instance.
+	Delegates are used to pass methods as arguments to other methods. Event handlers are nothing more than methods that are invoked through delegates. 
+		
+
+Solutions- collection of Projects
+Project- collection of source files
+
+C# Compilation
+	Similar to Java's compilation
+	Visual Studio generates Common Intermediate Language code (pseudo-assembly language; not specific to any processor)
+	Compiled to machine code just in time- turns into executable machine code just as needed
+	
+Project References- Link pieces of a program together  (The metadata of the code is where the references are contained(in a .proj file) not actually in the code directly (May have using but will not have reference unless linked))
+C# always does DLL (Dynamic-Link Library)
+Linking: 
+	Static Linking: Code is essentially just copied into where it is used
+	Dynamic Linking: Allows shared code to be shared between files not just copied
+	Why Dynamic Linking? Dynamic linking can reduce code size, allow piecewise updates
+	
+	Why JIT? JIT can be more portable(intermediate code is system-agnostic), compile with latest complier every time, re-optimize on the fly
+	
+Runtime(.NET) does JIT-ing  
+
+
+Revision Control System- collaborative editing, file history, backup, code archeology
+	Typically there are repositories which can be stored different places
+	Typical types: SVN, git, Perforce, Mercurial, CVS
+	We will use git in this class.
+	
+	Git
+		Repository on each machine you work on- tracks full contents and history of files locally
+		use push or pull to synchronize changes
+		
+		Committing- create snapshots of repository at one moment (Can go back in time thorugh commits and see changes.  Not same as synchronizing.)
+		Branching- "Quarantine" speculative modifications.  Can continue onward in both branches
+		Merging- combining changes back in to one, changes may be incompatible!
+		Push/Pull- Synchronize changes between repositories. (If you try to push while out of date, you must pull first, then merge changes)
+		
+		GitHub is the "server", stores your code in the cloud
+		So basically for our use:
+			pull it to the machine you're working on for the day
+			at the end of the day push it back to GitHub
+		
+
+Closure:
+	Closure is a "saved" lexical scope.
+	EX:
+	{	
+		int x;
+		Student s = ...
+		someFunc = s.GetMajor
+	}
+	
+	closure of someFunc
+		x
+		s
+		GetMajor
+		...
+		
+	A closure in C# takes the form of delegates.  Delegates "remember" the world they came from.
+	Details of delegate are hidden from the invoker- All it knows is the signature.
+	
+Separation of Concerns
+	Software components are not concerned with the other components
+	
+C# Extensions
+	Extensions look like methods added to an existing class
+		EX: Stack.IsOnTop(T x)
+		
+	Make a static class to hold extension methods
+		EX: static class PS1StackExtensions
+	Methods are of the form:
+		public static RETURN_TYPE foo(this TYPE x, ...)
+		
+
+Memory Models:
+C# like Java passes all items by value (for objects passes by object reference which means it passes the value (a copy) of the reference to the object) 
+	C# the same by default but gives some more control than Java 
+	
+Stack vs Heap: These are the places where memory of a program is allocated.
+	Stack- local variables/parameters for each function, set up by compiler
+	Heap- dynamically allocated memory, set up by new, garbage collector
+	
+	See a Memory Diagram for stack and heap of a given program.
+	
+	this keyword:
+		*Every non-static method has an implicit parameter called this which is passed into the method so it knows which specific object it is working with(in Python this is done explicitly with self)
+
+Structs- light-weight "objects" (Idea taken from C)
+	Generally used for packaging up small blobs of data. (usually don't have methods other than constructor but can.)
+	EX:
+	struct Address
+	{
+		string streetName;
+		uint streetNumber;
+		uint zip;
+	}
+	
+	Use them to package up lots of function arguments.
+	Structs aren't references (uses new but is on stack)
+	Passing a large struct by value copies a lot data
+	Can explicitly pass by reference too.
+
+Dependency Graph
+	Abstract data structure
+	represents some items depend on other items
+	EX: B1 depends on A1
+		B1 is A1's "dependent"
+		A1 is B1's "dependee"
+	Usually have through about graphs in terms of nodes and edges but can represent graphs in other ways
+	graph = { ("a", "b"),("a", "c"),("b", "d"),("d", "d")
+	}
+	In simple terms what you need is(Do not need to do graph traversal) (For now cycles are allowed to happen see d mapping to d) (Mapping implies C# dictionary):
+	Dependents: mapping from string to set of string
+		"a": {"b","c"}
+		"b": {"d"}
+		"d": {"d"}
+	Dependees: Mapping from string to set of string
+		"b": {"a"}
+		"c": {"a"}
+		"d": {"b", "d"}
+		
+C# Properties - "Syntactic sugar"
+	Want data protection (e.g. private)
+	But object.setX(...) or object.getY() can get annoying
+	Would rather do object.X = ...
+	
+	EX:
+	Define a Major property for Student:
+	
+	private string p_major; //This is a field
+	public string Major //This is a property
+	{
+		//Can make either get or set private to hide one of them
+		get
+		{
+			//invoked when reading Major
+			return p_major;
+		}
+		
+		set
+		{
+			if (value != "CS") //This allows us to do some error handling when something is is set
+				throw new Exception();
+			//invoked when assigning to Major
+			p_major = value;
+		}
+	}
+	
+	Then in the constructor which takes in major as a parameter, initialize Major property:
+	
+	Major = major; //(If set is hidden then use field name directly.)
+	
+Unit Testing
+	Unit testing allows for isolation of problems.  Tests for correct functionality.  Also test for correct failing.
+	Either describe tests with comments or name tests with descriptive name
+	Unit tests should ideally have 100% self-contained state, no outside reliance
+	Testing can only prove incorrectness
+	
+		
+Pointers and References-- a variable that holds an address
+	In C#:
+		EX: Student s1;
+			Creates a reference variable s1
+	In C/C++ can choose:
+		EX: Student s1;
+			Creates a Student variable s1
+			The object is on the stack
+		EX: Student* s1;
+			Creates a pointer variable s1
+			
+	EX: Student s1 = new ...;
+	s1 is the reference
+		The object "lives" elsewhere
+		We access the object by dereferencing s1
+			
+Variables vs Object
+	The variable is just the reference (or pointer)
+	The object is the data
+	
+	Two variables can reference(change) the same object
+	One variable can not change another variable
+	
+Exceptions are for exceptional situations- don't use exceptions for normal conditions
+
+We can explicitly pass arguments by reference instead of value
+In C#:
+	Two keywords: 
+		out- implies it is only an output
+			parameter must be assigned to somewhere in the method
+			EX:
+			Foo (out int x) {
+				//must assign to x
+			}
+			
+		ref- implies the function may use the initial value
+			similar to out except the value must be initialized first (does not need to assign to it)
+			EX:
+			int refParam = 10; // Initialization required
+			Foo (ref refParam)
+		
+	EX of out:
+		bool foo(out int result){
+			result = ...;
+			return ...;
+		}
+		main {
+			int fooResult;
+			bool b = foo(out fooResult); // Can see we must use out here too, this is required by the language just for the programming to acknowledge how it is being passed
+			// fooResult has been modified
+		}
+		
+EX of explicitly pass by reference in C++:
+	void Foo(int& i)
+	{
+		i = ...
+	}
+	
+	// Then when invoking:
+	Foo(i); //On callers end it is not clear that it is a reference
+	int i;
+	
+Can prevent usage of a try catch loops in certain situations (In the following EX prevents handling error when just using Int32.Parse):
+	EX:
+	int parsedVal;
+	if(Int32.TryParse(token, out parsedVal))
+		//use parsedVal
+
+Keep in mind where things are allocated in memory, think stack vs heap
+
+Operator Overloading:
+	Can overload many operators in C#, can't change precedence of operators though
+	Just because we can overload operators does not necessarily mean we should overload operators
+	Can use ReferenceEquals if we need to use the == operator when overloading it (prevents infinite recursion)
+	EX: 
+	public static bool operator ==(Student left, Student right)
+	{
+		//Define equality
+	}
+	
+Immutable Types- A type is "immutable" if it contains no modifier methods
+	In C# strings are immutable (This is the case because strings are often used as hashes and we do not want them changing to be able to still access it)
+	Change these types by reassigning it
+	EX: s = s.Trim();
+	
+	Enforces an invariant: cannot be modified after creation
+	Safely pass reference to method (without callee messing with the original)
+	Safely return references from methods (without caller messing with the original)
+	
+What if we want a mutable type but don't want certain methods to change it?
+	Make struct instead of class (object is copied)
+	Or, better yet, pass by const reference
+	In C++:
+	EX: 
+	void Foo(const Student& s)
+	{
+		// can not modify s
+	}
+	(Could technically cast away const so not a full solution)
+	In C#: No such thing, designers think that immutability should be the solution.
+	
+IEnumerable
+	Guarantees that something is countable and iterable (allows foreach loop)
+	Similar to Java's Iterator but is read-only (immutable, there is no Remove)
+	Any method returning IEnumerable should probably return a copy
+	If performance becomes a problem, consider other options
+	#1 rule of optimizing- don't
+
+Data Protection:
+Don't expose (by returning) private data references
+	Return a copy
+	Use an immutable IEnumerable wrapper class
+	C++ has const references
+	
+	These protections can typically be circumvented
+	This data protection is more for quality code and protection from accidental misuse by user of code more so than protection from some sort of hack/security concern
+	This protection is to encourage good engineering
+	
+Lambda Expressions: Define a function right where it's needed
+	EX: s => 0
+		Means: 
+			A function that takes one argument (s) and returns 0
+			Doesn't use its argument
+		Comparable to:
+		EX: 
+		int SomeFunc(string s)
+		{
+			return 0;
+		}
+	EX: (a,b) => expression
+		No types needed for inputs or outputs
+		Parentheses not needed for single input
+	Lambdas are not a valid function definition on its own, use inline where a delegate is expected
+	
+	Syntax for multiple statements: 
+	a => {statement1; statement2; ... return;}
+	
+	Where the lambda can be used is at a place that the compiler is expecting a specific type and this is why we do not need to specify a return type for the lambda
+	
+Shortcut for defining delegate types?
+	EX: Evaluate(String expr, Lookup lkp);
+	Can define the delegate type right here:
+	EX: Evaluate(String expr, Func<string,int> lkp);
+	
+	Syntax: Func<var1_type, var2_type, ..., return_type>
+	Inputs come first, output last
+	
+On Func, Lambdas
+	Makes life easier "in the moment"
+	They remove information from the code
+	Less readable
+	For simple expressions
+	
+IEnumerator<T>
+	First invocation of MoveNext puts it on the first element (Can't access first element using Current unil MoveNext is called)
+
+Inheritance in C#
+	Use : in class definition
+	EX: public class Primes : IEnumerable<int> { ... }
+	
+Can construct enumerations on-the-fly: Syntactic sugar for creating IEnumerable
+	yield return ...
+		Saves the execution state of the method, and returns
+		Next time MoveNext is called, execution resumes ("Remembers" where it left off) (Like a closure)
+		
+Bugs in programs are rarely at the point of failure, in real software the stack strace can be many frames deep and thus the bug could be anywhere in the trace
+Incremental Testing- continue test driven development but when implementing test as you implement
+	Catch design flaws early
+	Problems with be apparent before bolting it together
+Regression Testing
+	Run existing (old) tests regularly
+	Test suite continuously grows, never discard a valid test
+Smoke Tests
+	Subset of full suite of regression tests, should run in less than a few minutes
+	Try to pick broad range of coverage, run them after every compile
+Black Box Testing
+	All you know is the specification (Do not control or even know what is going on in between the inputs and outputs)
+White Box Testing
+	Know the specification but also have internal knowledge of the code to select inputs (Can write tests in a way to get better code coverage)
+	Goal is to typically get high code coverage
+Grey Box Testing
+	First design tests for specification (black)
+	Then design tests for code coverage (white)
+Integration Testing
+	Test end-usage of full product
+	
+Assertions in Regular Code
+	Debug.Assert(some condition);
+	Use them if your code assumes preconditions- good use of assertions can save countless hours of debugging 
+	Put these in places in code where invariants should hold
+	Assertions get removed in release builds 
+	
+Diagrams can typically encode more information than a textual representation
+UML- Unified Markup Language
+	Defines "Syntax" for drawing diagrams
+	Language agnostic
+	
+	Not all fields/methods need to be shown- only those for an understanding
+	- means private
+	+ means public
+	# means protected
+	underline means static
+	
+	Arrow indicates that one class is aware of another 
+		Direction indicates who is aware of who
+Aggregation vs Composition
+	Aggregation (Hollow diamond) 
+		Means something is composed of independent entities 
+		When the container goes away the entities do not ("weak" ownership)
+	Composition (Solid diamond)
+		Means entities within are not whole on their own ("strong" ownership)
+	
+	
+Insertion Order Set- uses a hash set and a list in tandem to get a data structure that has constant time operations and yet can retain order (List that doesn't store duplicates yet is still quick)
+
+Debugging tips
+	Simplify the problem - simplify inputs to reproduce the problem
+	Gather information- 
+		get as close to the point of failure as possible, start at crash and work backwards
+		use a piece of paper to write down and follow the program
+	Practice- get good with debugger, learn from how old bugs were found
+	Take a break
+
+Heisenbugs- bugs that seem to disappear or alter behavior when one attempts to study it
+	Uninitialized memory (Rare in C#)
+	Undefined behavior (Rare in C#)
+	Race Conditions (Common in any language)
+	Time-sensitive code (Common in any language)
+	
+When creating a polymorphic object, some base class constructor must be invoked
+	Let the compiler invoke the default(sometimes the default doesn't exist) or invoke one explicitly
+	Default Constructor:
+		A constructor that takes no arguments
+		Complier creates one for you only if you have not defined any constructors explicitly
+	
+Representing Data
+	XML- eXtensible Markup Language
+	
+	<fieldname> text data </fieldname>
+	<start element> data </end element>
+	
+	Similar to HTML in look but can make up any tags you want, but the thing interpreting it needs to know what it means
+	Compromise between human readable and machine readable
+	Makes parsing the data trivial
+	
+	Elements- logical document component that begins with a start-tag and ends with a matching end-tage or consists of only an empty-element tag:
+		Easy to read
+		Easy to parse
+	Attributes- consists of a name-value pair that exists within a start-tag or empty-element tag:
+		Use them for metadata
+		
+	EX:
+	<spreadsheet version="some version">
+		<cell>
+			<name>
+				cell name here
+			</name>
+			<contents>
+				cell contents goes here
+			</contents>
+		</cell>
+	</spreadsheet>
+	
+	XML in C#
+		using System.Xml
+		Then use XmlReader and XmlWriter to read and write XML files
+	
+finally keyword- post try-catch block
+	executed regardless of if catch is missing or if catch returns or throws
+	
+	commonly used like:
+	try{//open a file}
+	catch(){//something went wrong file left open}
+	finally{//close the file}
+	
+	try{//initialize some state; something may go wrong}
+	finally{//clean up}
+	
+In C# can use the overloaded using operator by using using in a method
+	EX:
+	using(IDisposable obj = new..)
+	{
+		// code here
+	}
+	// Is equivalent to the following code:
+	IDisposable obj = new ...;
+	try{
+		// code
+	}
+	finally{
+		obj.Dispose();
+	}
+File Paths:
+	Windows:
+		C:\some\place
+	Linux:
+		/some/place
+	
+GUIs
+	Visual Studio Provides a GUI builder- Windows Forms App
+		
+	Logic and UI should not be coupled, front end and back end should be decoupled; Think separation of concerns
+	GUI code should be driver only, containing little or no logic.
+	
+	Model View Controller (MVC)- Formalization of separate concerns for graphical programs, popular with games and web
+		View- What you see
+		Model- Core logic
+		Controller- Interface between the model and the view, inputs
+		Can unit test Controller and Model (The logic) without having it coupled to button clicks or other input events
+		The Controller and Model contains error handling
+		
+	GUI includes the View and Controller
+	
+	GUI programs are driven by inputs which are unpredictable and its execution is non-deterministic
+	
+	Event Driven Programming
+		Event- any occurrence that may require action by "someone" else
+		
+		Listeners "subscribe" to an event
+		Notifier "sends" the event
+		Listeners do what they want
+		
+		EX: 
+		A ButtonClick does not need to know about the Controller, it is simply triggering an event, it does not know who or how the event is handled
+		The ButtonClick will just simply project that is has been clicked and anything listening for that ButtonClick will do its thing
+		
+		
+		C# directly supports events 
+			In Windows Form Designer for events on buttons, text boxes, etc, declaring and registering for the event is as easy as double-clicking the thing in the designer, 
+			This automatically generates a handler and registers is (the code for registering it is in the Designer.cs file in the Windows Form Designer generated code region)
+		C# event:
+			1. Define a delegate for handling the event- all handlers match this signature
+				EX: delegate void CancellationEventHandler();
+			2. Declare an event (in the notifier)
+				EX: event CancellationEventHandler cancelEvent;
+			3. Register a handler (in the listener)
+				EX: university.cancelEvent += myHandler; // myHandler is declared elsewhere with the same signature as the delegate specifies; The handler will do something.
+			4. Trigger the event (in the notifier)
+				EX: void CancelCourse(){cancelEvent();} // Will go an execute all registered handlers (make sure there is stuff to execute before executing)
+			
+			EX: All together:
+			In University class:
+				public delegate void CancellationEventHandler();
+				public event CancellationEventHandler cancelEvent;
+				private void CancelCourse(){cancelEvent();}
+				
+			In Student class:
+				public Student(University u){
+					u.cancelEvent += handleCancel;
+				}
+				private void handleCancel(){...}
+				
+	
+	
+Serial Computing- One task after another
+Parallel Computing- Some tasks simultaneously 
+Unless we program for parallelism, we don't get it (typically, some languages parallelize some)
+Dependencies- one task requires completion of another task before it can begin
+
+Thread- a single sequential subprocess
+	almost like its own program
+	multi-threading is the ability of a computer to execute multiple threads concurrently
+	
+	Multi-threading in C#
+		Need some work to do (a function)
+			EX: void function() {...work...}
+		Create a thread for that work
+			EX: thread = new Thread{function}
+		Start the thread
+			EX: thread.Start(); // this is non-blocking (returns right away and the program can continue; like a wrapper around function)
+		Wait for it to finish (optional)
+			EX: thread.Join(); // this is blocking (waits until thread finishes, which is defined by when function returns)
+			
+		Notice the signature of the function has void return and no parameters but because of C# closure we can have all the data within the function:
+			Signature of the function has no parameters, how do we give it information about what to do?
+				Wrap foo in an object with fields
+		
+Timing
+	You can not make any assumptions about how long some computing operation will take.
+	With concurrency there is no guarantee on the order of events.
+	
+Concurrent
+	multiple tasks running
+	thread can be interrupted, preempted at any time
+	achieved by either:
+		OS rapidly switching threads/processes
+		Two threads/processes executing  (Parallelism)
+Parallelism is a special case of concurrency
+	Actually at the same time
+	Simultaneous multi-threading(SMT)
+		Ability of one core to execute multiple threads simultaneously (ex: hyperthreading)
+		
+C# Form is an "application message loop"
+	System creates a new thread to run the loop
+	Essentially:
+		EX:	
+		while(m = NextMessage())
+		{
+			HandleMessage(m);
+		}
+	Messages are placed on thread's "queue" by the OS
+	Messages are a key press, a mouse click, etc.
+	
+	We can pass our own messages to the loop with MethodInvoker.
+		The message is a method to execture.
+		Concurrency is lost for the method.
+			Method will run whenever message loop gets to it.
+	
+
+Worker Thread
+	Create a new thread to do the work so the message loop can continue 
+		C# provides BackgroundWorker through the GUI designer (BackgroundWorker is for convenience; allows us to pass arguments into a method doing work on a different thread easier)
+		Creates a thread that can do work and send "updates" to the GUI
+		
+		Events:
+			DoWork
+				Add a handler to this event that does the work, executed on its own thread
+			ProgressChanged
+				Add a handler that updates the GUI in some way, DoWork should trigger this event periodically
+			RunWorkerCompleted
+				Add a handler if you need to do something when done, automatically triggered when the work is finished
+		
+		We don't invoke DoWork event directly, use:
+			EX: worker.RunWorkerAsync(); // (worker is a BackgroundWorker object)
+		In some "cancel" button handler in your Form:
+			worker.CancelAsysnc();  // Just sets the CancellationPending property in the worker, does not directly cancel worker, name slightly misleading
+		Your work method must check for it periodically
+		
+
+General idea for concurrency:
+	1. setup anything that needs to be gathered before concurrency
+	2. start the thread
+	3. wait for the thread
+	4. safely cleanup
+
+Amdahl's Law:
+	Basically: If x% of the workload is parallelization we can reduce runtime by most x% with parallelism.
+	
+Multi-threading is not necessarily just for more compute, by being able to control what work is done when to some extent can improve the fluidity of something like a UI 
+	An expensive operation can be put on one thread while another thread does cheap operation it may have been blocking, does not necessarily use both cores to their fullest 
+	but greatly improves fluidity (cheap operations will perform without delay)
+		
+Race Condition: When two threads try to change the value of shared data at the same time; one thread will "win" and end up setting the value of the data to the final value
+	Critical Section- portion of an algorithm in which a race condition can occur
+		For guaranteed correctness no more than one thread must be in a critical section at a time
+		
+		EX: val = val + 5; // Can be critical if val is shared
+			Translates to :
+				load val // Gets val from memory location and stores in register to hold value
+				add val, 5 // Performs operation
+				set val // Sets new value to memory location
+Mutex
+	A mutex object(mutual exclusion) provides thread the ability to "lock" a section of code
+	When thread enters critical section it "locks the door" so no other code can enter (from other threads)
+	Built into C#:
+		lock in C#- One thread will be allowed in if two attempt to enter, and the other will wait to enter
+		EX: lock(a){// critical section of code}
+		a is an object that is the "key" to the lock, should be a shared member between potential things that can enter that code 
+		can be a static member that is shared between any two threads that try to enter, can be an arbitrary object just needs to be shared by members who may attempt to enter
+		a is not being locked, modifications are still possible to it, a is the "key"
